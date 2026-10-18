@@ -1,0 +1,142 @@
+:root {
+  --bg: #1a0f12;
+  --panel: #2a1a1e;
+  --text: #f5ead6;
+  --muted: #a8998a;
+  --gold: #d4af37;
+  --red: #8b1e2d;
+  --seat-size: 24px;
+  --seat-gap: 4px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.top-bar {
+  text-align: center;
+  padding: 16px;
+  border-bottom: 2px solid var(--gold);
+}
+.top-bar h1 { margin: 0; color: var(--gold); font-size: 1.6rem; letter-spacing: 1px; }
+.subtitle { margin: 4px 0 0; color: var(--muted); }
+
+/* ---------- Page layout ---------- */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+.map-panel, .card {
+  background: var(--panel);
+  border-radius: 10px;
+  padding: 14px;
+}
+.side-panel { display: flex; flex-direction: column; gap: 16px; }
+.card h2 { margin-top: 0; font-size: 1.1rem; color: var(--gold); }
+.muted { color: var(--muted); }
+
+/* ---------- Legends ---------- */
+.legend, .price-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 0;
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+}
+.legend li, .price-legend li { display: flex; align-items: center; gap: 6px; }
+.swatch { display: inline-block; width: 16px; height: 16px; cursor: default; }
+.price-dot { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+
+/* ---------- Viewport (zoom / pan area, used in Week 3) ---------- */
+.viewport {
+  overflow: auto;
+  max-height: 70vh;
+  background: #120a0c;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* ---------- Hall ---------- */
+.hall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  min-width: max-content;
+  margin: 0 auto;
+}
+
+.stage {
+  width: 60%;
+  min-width: 320px;
+  text-align: center;
+  padding: 14px;
+  background: linear-gradient(var(--red), #5c1320);
+  border: 2px solid var(--gold);
+  border-radius: 0 0 60px 60px;
+  letter-spacing: 6px;
+  font-weight: 600;
+}
+
+.middle { display: flex; gap: 28px; align-items: flex-start; }
+
+.section { text-align: center; }
+.section-title { font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; }
+
+.row { display: flex; align-items: center; justify-content: center; gap: var(--seat-gap); margin-bottom: var(--seat-gap); }
+.row-label { width: 22px; font-size: 0.7rem; color: var(--muted); }
+
+/* ---------- Seats ---------- */
+.seat {
+  width: var(--seat-size);
+  height: var(--seat-size);
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 6px 6px 3px 3px;
+  background: var(--seat-color, #888);
+  color: #000;
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+.seat:hover:not(:disabled) { filter: brightness(1.25); }
+.seat:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.seat.inspected { background: #fff; border-color: var(--gold); box-shadow: 0 0 6px var(--gold); }
+.seat.in-cart   { background: #2e9e5b; border-color: #b8ffd4; }
+.seat.unavailable { background: #444; opacity: 0.5; cursor: not-allowed; }
+
+.legend .seat { background: var(--seat-color, #d4af37); }
+
+/* ---------- Side panel ---------- */
+.btn {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn.primary { background: var(--gold); color: #000; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.cart-list { list-style: none; padding: 0; margin: 0 0 10px; }
+.total { font-size: 1.05rem; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  :root { --seat-size: 28px; }   /* bigger touch targets */
+}
