@@ -10,10 +10,8 @@
   <header class="top-bar">
     <h1>Baku Mugham Theatre</h1>
     <p class="subtitle">Select your seats</p>
+    <p class="summary" id="venue-summary"></p>
   </header>
-
-  <main class="layout">
-    <!-- Venue map -->
     <section class="map-panel" aria-label="Venue map">
       <ul class="legend" aria-label="Legend">
         <li><span class="swatch seat available"></span> Available</li>
@@ -23,14 +21,13 @@
       </ul>
       <ul class="price-legend" id="price-legend" aria-label="Price categories"></ul>
 
-      <!-- Week 3: zoom / move / reset buttons go here -->
-
+    
       <div class="viewport" id="viewport">
         <div class="hall" id="hall"></div>
       </div>
     </section>
 
-    <!-- Seat details + cart -->
+   
     <aside class="side-panel">
       <section class="card" aria-live="polite">
         <h2>Seat details</h2>
