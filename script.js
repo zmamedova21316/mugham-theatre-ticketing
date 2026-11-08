@@ -1,19 +1,22 @@
-/*Baku Mugham Theatre - venue data model*/
+/* Baku Mugham Theatre – venue data model*/
 const venue = {
   name: "Baku Mugham Theatre",
   sections: [
     { id: "parterre", name: "Parterre", price: 60, color: "#ff6fa5",
       rowLabels: ["A", "B", "C", "D"], seatsPerRow: 14, zone: "front" },
+ 
     { id: "loge-l", name: "Left Loge", price: 35, color: "#b79cf0",
       rowLabels: ["A", "B", "C"], seatsPerRow: 4, zone: "left" },
+ 
     { id: "stalls", name: "Mid Stalls", price: 40, color: "#ffb48a",
       rowLabels: ["E", "F", "G", "H", "I", "J"], seatsPerRow: 16, zone: "middle" },
+ 
     { id: "loge-r", name: "Right Loge", price: 35, color: "#b79cf0",
       rowLabels: ["A", "B", "C"], seatsPerRow: 4, zone: "right" },
+ 
     { id: "balcony", name: "Balcony", price: 25, color: "#7fd6c9",
       rowLabels: ["K", "L", "M", "N"], seatsPerRow: 18, zone: "back" }
   ],
-
   unavailable: [
     "parterre-A-5", "parterre-A-6", "parterre-B-7",
     "stalls-F-8", "stalls-F-9", "stalls-H-3",
@@ -24,12 +27,13 @@ const venue = {
  
 /*Application state*/
 const state = {
-  inspectedId: null,
-  cart: []           
+  inspectedId: null,   
+  cart: []            
 };
-const seatIndex = new Map();
-
-/* Generation of venue */
+ 
+const seatIndex = new Map();   
+ 
+/*Generation of the venue from data*/
 function makeSection(section) {
   const wrapper = document.createElement("div");
   wrapper.className = "section";
@@ -84,8 +88,8 @@ function buildVenue() {
  
   const bySection = id => venue.sections.find(s => s.id === id);
  
-  
   hall.appendChild(makeSection(bySection("parterre")));
+ 
   const middle = document.createElement("div");
   middle.className = "middle";
   ["loge-l", "stalls", "loge-r"].forEach(id => middle.appendChild(makeSection(bySection(id))));
@@ -96,7 +100,7 @@ function buildVenue() {
  
 function buildPriceLegend() {
   const list = document.getElementById("price-legend");
-  // one entry per distinct section name
+
   venue.sections.forEach(s => {
     const li = document.createElement("li");
     li.innerHTML = `<span class="price-dot" style="background:${s.color}"></span>${s.name}: ${s.price} AZN`;
@@ -112,7 +116,7 @@ function renderVenueSummary() {
     `${total} seats in ${venue.sections.length} zones · ${total - sold} available · ${sold} unavailable`;
 }
  
-/*Seat states and inspection*/
+/*Seat states + inspection*/
 function isUnavailable(id) { return venue.unavailable.includes(id); }
  
 function updateSeatStates() {
@@ -134,8 +138,8 @@ function clearInspection() {
 }
  
 function inspectSeat(id) {
-  if (isUnavailable(id)) return;       //unavailable seats cannot be inspected/added
-  if (state.inspectedId === id) {      //clicking the same seat again deselects it
+  if (isUnavailable(id)) return;       
+  if (state.inspectedId === id) {      
     clearInspection();
     return;
   }
@@ -156,13 +160,12 @@ function inspectSeat(id) {
       <dd><span class="badge ${inCart ? "in-cart" : "free"}">
         ${inCart ? "In your cart" : "Available – not in cart yet"}</span></dd>
     </dl>`;
- 
-  
+
   document.getElementById("add-to-cart").disabled = inCart;
   updateSeatStates();
 }
  
-/*Cart with add/remove/render/localStorage*/
+/*Cart: add/remove/render and localStorage*/
 const CART_KEY = "mughamTheatreCart";
  
 function saveCart() {
@@ -172,12 +175,12 @@ function saveCart() {
     console.warn("Could not save the cart:", err);
   }
 }
+ 
 function loadCart() {
   try {
     const saved = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
     if (!Array.isArray(saved)) return;
-
-    //keep only valid, available, non-duplicate seat IDs
+    
     state.cart = saved.filter((id, i) =>
       typeof id === "string" &&
       seatIndex.has(id) &&
@@ -190,7 +193,7 @@ function loadCart() {
  
 function addToCart() {
   const id = state.inspectedId;
-  if (!id || isUnavailable(id) || state.cart.includes(id)) return;  //no duplicates
+  if (!id || isUnavailable(id) || state.cart.includes(id)) return;//no duplicates
   state.cart.push(id);
   saveCart();
   renderCart();
@@ -204,10 +207,10 @@ function removeFromCart(id) {
   renderCart();
   if (state.inspectedId === id) {
     state.inspectedId = null;
-    inspectSeat(id);          //refresh the details panel for this seat
+    inspectSeat(id);          
   } else {
-    updateSeatStates();       //seat on  map goes back to "available"
-  }
+    updateSeatStates();       
+}
 }
  
 function renderCart() {
@@ -243,19 +246,17 @@ function renderCart() {
   document.getElementById("cart-total").textContent = total;
 }
 
-
-
-
 /*Map navigation:zoom,move,reset*/
 const ZOOM_MIN = 0.3;
 const ZOOM_MAX = 2.5;
 const ZOOM_STEP = 0.2;
-const MOVE_STEP = 60;       
-const KEEP_VISIBLE = 100;   
+const MOVE_STEP = 60;  
+const KEEP_VISIBLE = 100;
  
 const viewportEl = document.getElementById("viewport");
 const hallEl = document.getElementById("hall");
 const view = { x: 0, y: 0, zoom: 1 };
+ 
 function clampView() {
   const w = hallEl.offsetWidth * view.zoom;
   const h = hallEl.offsetHeight * view.zoom;
@@ -268,27 +269,30 @@ function applyView() {
   hallEl.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.zoom})`;
 }
  
-function setZoom(newZoom) {
+function zoomAt(newZoom, px, py) {
   newZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, newZoom));
-  
-  const cx = viewportEl.clientWidth / 2;
-  const cy = viewportEl.clientHeight / 2;
   const ratio = newZoom / view.zoom;
-  view.x = cx - (cx - view.x) * ratio;
-  view.y = cy - (cy - view.y) * ratio;
+  view.x = px - (px - view.x) * ratio;
+  view.y = py - (py - view.y) * ratio;
   view.zoom = newZoom;
   applyView();
 }
+ 
+function setZoom(newZoom) {
+  zoomAt(newZoom, viewportEl.clientWidth / 2, viewportEl.clientHeight / 2);
+}
+ 
 function moveBy(dx, dy) {
   view.x += dx;
   view.y += dy;
   applyView();
 }
+ 
 function resetView() {
   const vw = viewportEl.clientWidth;
-  const fit = (vw - 24) / hallEl.offsetWidth;         
+  const fit = (vw - 24) / hallEl.offsetWidth;          
   view.zoom = Math.max(ZOOM_MIN, Math.min(1, fit));
-  view.x = (vw - hallEl.offsetWidth * view.zoom) / 2;
+  view.x = (vw - hallEl.offsetWidth * view.zoom) / 2;  
   view.y = 10;
   applyView();
 }
@@ -297,17 +301,19 @@ function resetView() {
 document.getElementById("hall").addEventListener("click", e => {
   const btn = e.target.closest(".seat[data-id]");
   if (btn) inspectSeat(btn.dataset.id);
-}); 
+});
+ 
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") clearInspection();
 });
-document.getElementById("add-to-cart").addEventListener("click", addToCart); 
+ 
+document.getElementById("add-to-cart").addEventListener("click", addToCart);
+ 
 document.getElementById("cart-list").addEventListener("click", e => {
   const btn = e.target.closest("[data-remove]");
   if (btn) removeFromCart(btn.dataset.remove);
 });
  
-
 
 document.getElementById("map-controls").addEventListener("click", e => {
   const btn = e.target.closest("[data-action]");
@@ -321,16 +327,72 @@ document.getElementById("map-controls").addEventListener("click", e => {
     case "right":    moveBy(-MOVE_STEP, 0); break;
     case "reset":    resetView(); break;
   }
-}
-);
+});
  
 window.addEventListener("resize", applyView);
+ 
+/*Bonus*/
+const DRAG_THRESHOLD = 5;     
+const WHEEL_FACTOR = 1.1;      
+let drag = null;              
+let justDragged = false;      
+
+viewportEl.addEventListener("wheel", e => {
+  e.preventDefault();// stop the page from scrolling while zooming map
+  const rect = viewportEl.getBoundingClientRect();
+  const px = e.clientX - rect.left - viewportEl.clientLeft;
+  const py = e.clientY - rect.top - viewportEl.clientTop;
+  const factor = e.deltaY < 0 ? WHEEL_FACTOR : 1 / WHEEL_FACTOR;
+  zoomAt(view.zoom * factor, px, py);
+}, { passive: false });
+ 
+
+
+viewportEl.addEventListener("pointerdown", e => {
+  if (e.pointerType !== "mouse" || e.button !== 0) return;//touch keeps normal scrolling
+  drag = { startX: e.clientX, startY: e.clientY, viewX: view.x, viewY: view.y, moved: false };
+});
+ 
+window.addEventListener("pointermove", e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.startX;
+  const dy = e.clientY - drag.startY;
+  if (!drag.moved) {
+    if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;//still just a click
+    drag.moved = true;
+    viewportEl.classList.add("dragging");
+  }
+  view.x = drag.viewX + dx;
+  view.y = drag.viewY + dy;
+  applyView();
+});
+ 
+function endDrag() {
+  if (!drag) return;
+  if (drag.moved) {
+    justDragged = true;                       
+    setTimeout(() => { justDragged = false; }, 0);
+  }
+  drag = null;
+  viewportEl.classList.remove("dragging");
+}
+window.addEventListener("pointerup", endDrag);
+window.addEventListener("pointercancel", endDrag);
+ 
+
+
+viewportEl.addEventListener("click", e => {
+  if (justDragged) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+}, true);
  
 /*Init*/
 buildVenue();
 buildPriceLegend();
 renderVenueSummary();
-loadCart();  //restore cart from localStorage
+loadCart();//restore cart from localStorage
 renderCart();
 updateSeatStates();//restore matching seat states on the map
-resetView();
+resetView(); 
